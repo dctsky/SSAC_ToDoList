@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_to_do_list/model/todo.dart';
 
 class ToDoTile extends StatefulWidget {
+  final Todo todo;
+  ToDoTile(this.todo);
+
   @override
   _ToDoTileState createState() => _ToDoTileState();
 }
@@ -23,8 +27,7 @@ class _ToDoTileState extends State<ToDoTile> {
             });
           },
           controlAffinity: ListTileControlAffinity.leading,
-          title: Text(
-            '할일 제목',
+          title: Text(widget.todo.title,
             style: TextStyle(
               color: _isChecked == true ? Colors.grey[350] : Colors.black54,
               decoration:
@@ -34,7 +37,7 @@ class _ToDoTileState extends State<ToDoTile> {
             ),
           ),
           subtitle: Text(
-            '할일 내용',
+            widget.todo.content,
             style: TextStyle(
               color: _isChecked == true ? Colors.grey[350] : Colors.black54,
               decoration:
