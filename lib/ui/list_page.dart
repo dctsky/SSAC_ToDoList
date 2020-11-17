@@ -13,6 +13,7 @@ class _ListPageState extends State<ListPage> {
   bool _isChecked = false;
   List<Todo> _items = [];
   TextEditingController _textEditingController;
+  var _query = "";
 
   @override
   void initState() {
@@ -49,15 +50,14 @@ class _ListPageState extends State<ListPage> {
             size: 30,
             color: Colors.white,
           ),
-          onPressed: () async {
+          onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CreatePage()),
             ).then((value) async {
               _items = await DBHelper.db.getAllTodos();
             }).then((value) {
-              setState(() {
-              });
+              setState(() {});
             });
           },
         ),
@@ -72,12 +72,17 @@ class _ListPageState extends State<ListPage> {
           child: Column(
             children: [
               TextField(
+                onChanged: (text) {
+                  setState(() {
+                    _query = text;
+                  });
+                },
                 autofocus: false,
                 controller: _textEditingController,
                 cursorColor: Colors.white,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Search',
+                  hintText: '검색',
                   hintStyle: TextStyle(color: Colors.white),
                   filled: true,
                   enabledBorder: OutlineInputBorder(
@@ -98,10 +103,13 @@ class _ListPageState extends State<ListPage> {
           ),
         ),
         SliverList(
-          delegate: SliverChildBuilderDelegate((context, index) {
-            return ToDoTile(_items[index]);
-          }, childCount: _items.length),
-        ),
+            delegate: SliverChildListDelegate(
+          _items
+              .where((e) => e.title.toLowerCase().contains(_query.toLowerCase()))
+              .map((e) => ToDoTile(e))
+              .toList(),
+        )
+            ),
       ],
     );
   }
