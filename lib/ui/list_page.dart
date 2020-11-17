@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_to_do_list/widget/to_do_tile.dart';
 
 class ListPage extends StatefulWidget {
   @override
@@ -7,47 +8,49 @@ class ListPage extends StatefulWidget {
 
 class _ListPageState extends State<ListPage> {
   bool _isChecked = false;
+  List<Widget> _items = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('To Do List'),
-      ),
+      backgroundColor: Colors.amber[400],
+      appBar: _buildAppBar(),
       body: _buildBody(),
     );
   }
 
   _buildBody() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return Card(
-            child: CheckboxListTile(
-          value: _isChecked,
-          onChanged: (bool value) {
-            setState(() {
-              _isChecked = value;
-            });
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: TextField(),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) => ToDoTile(),
+              childCount: 5),
+        ),
+      ],
+    );
+  }
+
+  _buildAppBar() {
+    return AppBar(
+      title: Text("TO DO"),
+      centerTitle: true,
+      backgroundColor: Colors.amber[400],
+      elevation: 0,
+      actions: [
+        IconButton(
+          icon: Icon(
+            Icons.add,
+            size: 30,
+            color: Colors.white,
+          ),
+          onPressed: () {
+
           },
-          controlAffinity: ListTileControlAffinity.leading,
-          title: Text(
-            '할일 제목',
-            style: TextStyle(
-              color: _isChecked == true ? Colors.grey : Colors.black,
-              decoration:
-                  _isChecked == true ? TextDecoration.lineThrough : null,
-            ),
-          ),
-          subtitle: Text(
-            '할일 내용',
-            style: TextStyle(
-              color: _isChecked == true ? Colors.grey : Colors.black,
-              decoration:
-                  _isChecked == true ? TextDecoration.lineThrough : null,
-            ),
-          ),
-        ));
-      },
+        ),
+      ],
     );
   }
 }
