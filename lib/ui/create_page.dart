@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_to_do_list/db/database_helpers.dart';
 import 'package:flutter_to_do_list/model/todo.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:intl/intl.dart';
 
 class CreatePage extends StatefulWidget {
   @override
@@ -104,7 +103,10 @@ class _CreatePageState extends State<CreatePage> {
           ),
           shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
           onPressed: () {
-            DBHelper.db.insertTodo(Todo(title: _titleController.text, content: _contentController.text, date: ''));
+            DBHelper.db.insertTodo(Todo(
+                title: _titleController.text,
+                content: _contentController.text,
+                date: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())));
 
             Navigator.pop(this.context);
           },

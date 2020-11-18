@@ -33,7 +33,7 @@ class DBHelper {
       onCreate: (Database db, int version) async {
         // 데이터베이스에 CREATE TABLE 수행
         await db.execute(
-            "CREATE TABLE $tableName (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT, date TEXT)");
+            "CREATE TABLE $tableName (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT, date TEXT, isChecked INTEGER)");
       },
     );
   }
@@ -57,6 +57,7 @@ class DBHelper {
     var res = await db.query(tableName);
     List<Todo> list =
     res.isNotEmpty ? res.map((c) => Todo.fromJson(c)).toList() : [];
+    list.sort((a, b) => a.isChecked.compareTo(b.isChecked));
     return list;
   }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_to_do_list/ui/create_page.dart';
-import 'package:flutter_to_do_list/widget/to_do_tile.dart';
 import 'package:flutter_to_do_list/db/database_helpers.dart';
 import 'package:flutter_to_do_list/model/todo.dart';
+import 'package:flutter_to_do_list/extensions/extensions.dart';
 
 class ListPage extends StatefulWidget {
   @override
@@ -10,7 +10,6 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  bool _isChecked = false;
   List<Todo> _items = [];
   TextEditingController _textEditingController;
   var _query = "";
@@ -54,11 +53,9 @@ class _ListPageState extends State<ListPage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CreatePage()),
-            ).then((value) async {
-              _items = await DBHelper.db.getAllTodos();
-            }).then((value) {
-              setState(() {});
-            });
+            ).then((value) => _fetchList());
+
+            setState(() {});
           },
         ),
       ],
@@ -103,14 +100,54 @@ class _ListPageState extends State<ListPage> {
           ),
         ),
         SliverList(
-            delegate: SliverChildListDelegate(
-          _items
-              .where((e) => e.title.toLowerCase().contains(_query.toLowerCase()))
-              .map((e) => ToDoTile(e))
-              .toList(),
-        )
-            ),
+          delegate: SliverChildListDelegate(_items
+              .where(
+                  (e) => e.title.toLowerCase().contains(_query.toLowerCase()))
+              .map((e) => _buildTile(e))
+              .toList()),
+        ),
       ],
     );
+  }
+
+  Widget _buildTile(todo) {
+    return Card(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        child: CheckboxListTile(
+            activeColor: Colors.amber,
+            contentPadding: EdgeInsets.all(4.0),
+            value: todo.isChecked == 0 ? false : true,
+            onChanged: (bool value) {
+              value == false ? todo.isChecked = 0 : todo.isChecked = 1;
+              setState(() {
+                DBHelper.db.updateTodo(todo);
+                _fetchList();
+              });
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            title: Text(
+              todo.title,
+              style: TextStyle(
+                color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                decoration:
+                    todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              todo.content,
+              style: TextStyle(
+                color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                decoration:
+                    todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+              ),
+            ),
+            secondary: Text(
+              todo.date,
+              style: TextStyle(color: Colors.grey),
+              textAlign: TextAlign.end,
+            )));
   }
 }
