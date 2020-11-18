@@ -111,43 +111,54 @@ class _ListPageState extends State<ListPage> {
   }
 
   Widget _buildTile(todo) {
-    return Card(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        child: CheckboxListTile(
-            activeColor: Colors.amber,
-            contentPadding: EdgeInsets.all(4.0),
-            value: todo.isChecked == 0 ? false : true,
-            onChanged: (bool value) {
-              value == false ? todo.isChecked = 0 : todo.isChecked = 1;
-              setState(() {
-                DBHelper.db.updateTodo(todo);
-                _fetchList();
-              });
-            },
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(
-              todo.title,
-              style: TextStyle(
-                color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
-                decoration:
-                    todo.isChecked == 0 ? null : TextDecoration.lineThrough,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+    return Dismissible(
+      background: Container(
+        color: Colors.red,
+        child: Icon(Icons.delete_forever),
+      ),
+      key: ValueKey(todo.id.toString()),
+      onDismissed: (DismissDirection direction) {
+          _items.remove(todo);
+          DBHelper.db.deleteTodo(todo.id);
+      },
+      child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          child: CheckboxListTile(
+              activeColor: Colors.amber,
+              contentPadding: EdgeInsets.all(4.0),
+              value: todo.isChecked == 0 ? false : true,
+              onChanged: (bool value) {
+                value == false ? todo.isChecked = 0 : todo.isChecked = 1;
+                setState(() {
+                  DBHelper.db.updateTodo(todo);
+                  _fetchList();
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(
+                todo.title,
+                style: TextStyle(
+                  color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                  decoration:
+                      todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            subtitle: Text(
-              todo.content,
-              style: TextStyle(
-                color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
-                decoration:
-                    todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+              subtitle: Text(
+                todo.content,
+                style: TextStyle(
+                  color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                  decoration:
+                      todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+                ),
               ),
-            ),
-            secondary: Text(
-              todo.date,
-              style: TextStyle(color: Colors.grey),
-              textAlign: TextAlign.end,
-            )));
+              secondary: Text(
+                todo.date,
+                style: TextStyle(color: Colors.grey),
+                textAlign: TextAlign.end,
+              ))),
+    );
   }
 }
