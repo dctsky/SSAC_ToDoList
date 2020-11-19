@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_to_do_list/ui/create_page.dart';
 import 'package:flutter_to_do_list/db/database_helpers.dart';
 import 'package:flutter_to_do_list/model/todo.dart';
-import 'package:flutter_to_do_list/extensions/extensions.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_to_do_list/ui/update_page.dart';
 
 class ListPage extends StatefulWidget {
   @override
@@ -111,16 +112,37 @@ class _ListPageState extends State<ListPage> {
   }
 
   Widget _buildTile(todo) {
-    return Dismissible(
-      background: Container(
-        color: Colors.red,
-        child: Icon(Icons.delete_forever),
-      ),
-      key: ValueKey(todo.id.toString()),
-      onDismissed: (DismissDirection direction) {
-          _items.remove(todo);
-          DBHelper.db.deleteTodo(todo.id);
-      },
+    return Slidable(
+      actionPane: SlidableDrawerActionPane(),
+      actionExtentRatio: 0.25,
+      actions: [
+        IconSlideAction(
+          caption: '수정',
+          color: Colors.green,
+          icon: Icons.create,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UpdatePage(todo)),
+            ).then((value) => _fetchList());
+
+            setState(() {});
+          },
+        ),
+      ],
+      secondaryActions: [
+        IconSlideAction(
+          caption: '삭제',
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () {
+            _items.remove(todo);
+            DBHelper.db.deleteTodo(todo.id).then((value) => _fetchList());
+
+            setState(() {});
+          },
+        ),
+      ],
       child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -139,7 +161,8 @@ class _ListPageState extends State<ListPage> {
               title: Text(
                 todo.title,
                 style: TextStyle(
-                  color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                  color:
+                      todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
                   decoration:
                       todo.isChecked == 0 ? null : TextDecoration.lineThrough,
                   fontSize: 18,
@@ -149,7 +172,8 @@ class _ListPageState extends State<ListPage> {
               subtitle: Text(
                 todo.content,
                 style: TextStyle(
-                  color: todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                  color:
+                      todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
                   decoration:
                       todo.isChecked == 0 ? null : TextDecoration.lineThrough,
                 ),

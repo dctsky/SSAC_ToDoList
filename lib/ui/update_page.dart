@@ -3,14 +3,27 @@ import 'package:flutter_to_do_list/db/database_helpers.dart';
 import 'package:flutter_to_do_list/model/todo.dart';
 import 'package:intl/intl.dart';
 
-class CreatePage extends StatefulWidget {
+class UpdatePage extends StatefulWidget {
+  Todo todo;
+
+  UpdatePage(this.todo);
+
   @override
-  _CreatePageState createState() => _CreatePageState();
+  _UpdatePageState createState() => _UpdatePageState();
 }
 
-class _CreatePageState extends State<CreatePage> {
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+class _UpdatePageState extends State<UpdatePage> {
+  TextEditingController _titleController;
+
+  TextEditingController _contentController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _titleController = new TextEditingController(text: widget.todo.title);
+    _contentController = new TextEditingController(text: widget.todo.content);
+  }
 
   @override
   void dispose() {
@@ -38,7 +51,6 @@ class _CreatePageState extends State<CreatePage> {
             controller: _titleController,
             maxLines: 1,
             decoration: InputDecoration(
-              hintText: '제목',
               hintStyle: TextStyle(color: Colors.white),
               filled: true,
               enabledBorder: OutlineInputBorder(
@@ -62,7 +74,6 @@ class _CreatePageState extends State<CreatePage> {
             maxLines: 3,
             autocorrect: false,
             decoration: InputDecoration(
-              hintText: '내용',
               hintStyle: TextStyle(color: Colors.white),
               filled: true,
               enabledBorder: OutlineInputBorder(
@@ -84,7 +95,7 @@ class _CreatePageState extends State<CreatePage> {
 
   Widget _buildAppBar() {
     return AppBar(
-      title: Text("ADD A NEW TASK"),
+      title: Text("UDATE TASK"),
       centerTitle: true,
       backgroundColor: Colors.amber[400],
       elevation: 0,
@@ -97,10 +108,12 @@ class _CreatePageState extends State<CreatePage> {
           ),
           shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
           onPressed: () {
-            DBHelper.db.insertTodo(Todo(
-                title: _titleController.text,
-                content: _contentController.text,
-                date: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now())));
+            DBHelper.db.updateTodo(Todo(
+              id: widget.todo.id,
+              title: _titleController.text,
+              content: _contentController.text,
+              date: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+            ));
 
             Navigator.pop(this.context);
           },
