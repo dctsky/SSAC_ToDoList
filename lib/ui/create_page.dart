@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_to_do_list/db/database_helpers.dart';
 import 'package:flutter_to_do_list/model/todo.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_to_do_list/extensions/extensions.dart';
 
 class CreatePage extends StatefulWidget {
   @override

@@ -1,14 +1,12 @@
 import 'package:intl/intl.dart';
 
-extension ToDate on String {
-
+extension MyString on String {
   DateTime stringToDate() {
     return DateTime.parse(this);
   }
-
+}
+extension MyDate on DateTime {
   String dateToString(String dateFormat) {
-    DateTime date = DateTime.parse(this);
-    String result = DateFormat(dateFormat).format(date);
-    return result;
+    return DateFormat(dateFormat).format(this);
   }
 }

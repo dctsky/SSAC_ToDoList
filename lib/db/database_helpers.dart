@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_to_do_list/model/todo.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_to_do_list/extensions/extensions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -57,7 +57,6 @@ class DBHelper {
     var res = await db.query(tableName);
     List<Todo> list =
     res.isNotEmpty ? res.map((c) => Todo.fromJson(c)).toList() : [];
-    list.sort((a, b) => a.isChecked.compareTo(b.isChecked));
     return list;
   }
 

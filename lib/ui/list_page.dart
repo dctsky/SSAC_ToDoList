@@ -4,6 +4,8 @@ import 'package:flutter_to_do_list/db/database_helpers.dart';
 import 'package:flutter_to_do_list/model/todo.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_to_do_list/ui/update_page.dart';
+import 'package:flutter_to_do_list/extensions/extensions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListPage extends StatefulWidget {
   @override
@@ -14,18 +16,52 @@ class _ListPageState extends State<ListPage> {
   List<Todo> _items = [];
   TextEditingController _textEditingController;
   var _query = "";
+  int _counter = 0;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _incrementCounter();
     _fetchList();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showDialog());
+
+  }
+
+  _incrementCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _counter = (prefs.getInt('counter') ?? 0) + 1;
+    await prefs.setInt('counter', _counter);
+    // prefs.remove('counter');
+  }
+
+  _showDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: new Text("환영합니다.\n $_counter번째 방문이시군요."),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Close"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   Future<void> _fetchList() async {
     // DBHelper.db.deleteAllTodos();
     _items = await DBHelper.db.getAllTodos();
-    setState(() {});
+    setState(() {
+      _items.sort((b, a) =>
+          a.date.stringToDate().compareTo(b.date.stringToDate()));
+      _items.sort((a, b) => a.isChecked.compareTo(b.isChecked));
+    });
   }
 
   @override
@@ -33,7 +69,7 @@ class _ListPageState extends State<ListPage> {
     return Scaffold(
       backgroundColor: Colors.amber[400],
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body:  _buildBody(),
     );
   }
 
@@ -111,7 +147,7 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  Widget _buildTile(todo) {
+  Widget _buildTile(Todo todo) {
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
@@ -125,8 +161,6 @@ class _ListPageState extends State<ListPage> {
               context,
               MaterialPageRoute(builder: (context) => UpdatePage(todo)),
             ).then((value) => _fetchList());
-
-            setState(() {});
           },
         ),
       ],
@@ -138,14 +172,12 @@ class _ListPageState extends State<ListPage> {
           onTap: () {
             _items.remove(todo);
             DBHelper.db.deleteTodo(todo.id).then((value) => _fetchList());
-
-            setState(() {});
           },
         ),
       ],
       child: Card(
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           child: CheckboxListTile(
               activeColor: Colors.amber,
               contentPadding: EdgeInsets.all(4.0),
@@ -162,9 +194,9 @@ class _ListPageState extends State<ListPage> {
                 todo.title,
                 style: TextStyle(
                   color:
-                      todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                  todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
                   decoration:
-                      todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+                  todo.isChecked == 0 ? null : TextDecoration.lineThrough,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -173,13 +205,13 @@ class _ListPageState extends State<ListPage> {
                 todo.content,
                 style: TextStyle(
                   color:
-                      todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
+                  todo.isChecked == 0 ? Colors.black54 : Colors.grey[350],
                   decoration:
-                      todo.isChecked == 0 ? null : TextDecoration.lineThrough,
+                  todo.isChecked == 0 ? null : TextDecoration.lineThrough,
                 ),
               ),
               secondary: Text(
-                todo.date,
+                todo.date.stringToDate().dateToString('yy.MM.dd EEE'),
                 style: TextStyle(color: Colors.grey),
                 textAlign: TextAlign.end,
               ))),
