@@ -26,7 +26,6 @@ class _ListPageState extends State<ListPage> {
     _incrementCounter();
     _fetchList();
     WidgetsBinding.instance.addPostFrameCallback((_) => _showDialog());
-
   }
 
   _incrementCounter() async {

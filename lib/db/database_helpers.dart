@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter_to_do_list/model/todo.dart';
-import 'package:flutter_to_do_list/extensions/extensions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -18,7 +17,7 @@ class DBHelper {
     return _database;
   }
 
-  initDB() async {
+  Future<Database> initDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'todo.db');
@@ -30,13 +29,16 @@ class DBHelper {
     return await openDatabase(
       path,
       version: 1,
-      onCreate: (Database db, int version) async {
-        // 데이터베이스에 CREATE TABLE 수행
-        await db.execute(
-            "CREATE TABLE $tableName (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT, date TEXT, isChecked INTEGER)");
-      },
+      onCreate: _onCreate,
     );
   }
+
+  _onCreate(Database db, int version) async {
+    //db를 생성할 때 table도 생성
+    await db.execute(
+        "CREATE TABLE $tableName (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, content TEXT, date TEXT, isChecked INTEGER)");
+  }
+
   // CREATE
   insertTodo(Todo todo) async {
     final db = await database;
@@ -56,7 +58,7 @@ class DBHelper {
     final db = await database;
     var res = await db.query(tableName);
     List<Todo> list =
-    res.isNotEmpty ? res.map((c) => Todo.fromJson(c)).toList() : [];
+        res.isNotEmpty ? res.map((c) => Todo.fromJson(c)).toList() : [];
     return list;
   }
 

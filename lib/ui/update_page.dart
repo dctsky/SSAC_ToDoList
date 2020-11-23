@@ -95,7 +95,7 @@ class _UpdatePageState extends State<UpdatePage> {
 
   Widget _buildAppBar() {
     return AppBar(
-      title: Text("UDATE TASK"),
+      title: Text("UPDATE TASK"),
       centerTitle: true,
       backgroundColor: Colors.amber[400],
       elevation: 0,
